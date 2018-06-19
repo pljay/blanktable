@@ -3,7 +3,9 @@ function tablelimit(data) {
         var amount = data.amount;
         var weeks = data.weeks;
         if (type == "否") {
-            $("#one p").remove();
+            //隐藏单周字体
+            //删除双周字段
+            $("#one p").empty();
             $("#two").remove();
             var thList = $("#one table thead tr").children("th");
             for (var i = 0; i < thList.length; i++) {

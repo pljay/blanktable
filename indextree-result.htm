@@ -9,8 +9,8 @@
     <link rel="shortcut icon" href="favicon.ico.css" />
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="bootstrap/css/bootstrap-theme.min.css" rel="stylesheet">
-    <!-- <link rel="stylesheet"
-        href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css"> -->
+    <link rel="stylesheet"
+          href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
     <link rel="stylesheet" type="text/css" href="css/htmleaf-demo.css">
     <link href="dist/css/tableexport.min.css" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="normalize.css" />
@@ -214,37 +214,23 @@
             <tbody>
             <tr value="01">
                 <th>1</th>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
             </tr>
             <tr value="02">
                 <th>2</th>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
-                <td><span class="ui-droppable">11<img
-                        src="btn_delete.png"></span><br></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
             </tr>
             <tr value="03">
                 <th>3</th>
@@ -394,7 +380,7 @@
 
         $.ajax({
             type: "post",
-            url: "IsDoubleweek?taskid=" + taskid,
+            url: "../../../IsDoubleweek?taskid=" + taskid,
             async: false,
             dataType: "jsonp",
             jsonpCallback: "jsonpCallback",//自定义的jsonp回调函数名,默认为jQuery自动生成的随机函数
@@ -441,8 +427,8 @@
                             var id = $(this).attr("id");
                             console.log(id);
                             for (var i = 0; i < data.length; i++) {
-                                console.log( data[i].coursename)
-                                if (id == data[i].id && data[i].courseid != "") {
+                                console.log( data[i].subjectname)
+                                if (id == data[i].id && data[i].subjectid != "") {
                                     $(this).append("<span gradeid='" + data[i].gradeid + "' classid='" + data[i].classid + "' subjectid='" + data[i].subjectid + "'  teacherid='" + data[i].teacherid + "'   class='" + data[i].coursetype + "'>" +data[i].gradename+data[i].classname+"</br>"+data[i].subjectname+"-"+data[i].teachername + "<img src='btn_delete.png' ></span><br>");
                                 }
                             }
@@ -478,7 +464,7 @@
 
         var $table = $("#tbb");
         $table.bootstrapTable({
-            url: 'GradeAndTeacherList?taskid='+taskid,
+            url: '../../../GradeAndTeacherList?taskid='+taskid,
             dataType: "jsonp",//数据类型
             method: 'get',
             async: false,
@@ -529,30 +515,9 @@
                             }
                         })
                         console.log(type)
-                        var rootid = "";
-                        var title = "";
-                        //递归获取节点名称
-                        function findRootid(source) {
-                            //dom对象转换为jQuery对象
-                            //目的使用jQuery方法
-                            $this = $(source)
-                            if ($this.treegrid('getParentNodeId') != null) {
-                                rootid = $this.treegrid('getParentNodeId');
-                                title = $this.text() + title;
-                                findRootid($this.treegrid('getParentNode'));
-                            } else {
-                                //增加标题
-                                title = $this.text() + "<br>" + title;
-                                $(".col-sm-12 ").find("h4").remove();
-                                $(".col-sm-12 p").before("<h4 align='center'>" + title + "</h4>");
-                                title = ""
-                            }
-                        }
-
-                        findRootid(source);
                         $.ajax({
                             type: "post",
-                            url: "TimetableResultList",
+                            url: "../../../TimetableResultList",
                             async: true,
                             dataType: 'json',
                             // data: { strJson: JSON.stringify(row) },
@@ -560,6 +525,26 @@
                             //id:对应teacher和subjectid
                             data: {taskid: taskid, id: id, schoolid: schoolid, type: type},
                             success: function (data) {
+                                var rootid = "";
+                                var title = "";
+                                //递归获取节点名称
+                                function findRootid(source) {
+                                    //dom对象转换为jQuery对象
+                                    //目的使用jQuery方法
+                                    $this = $(source)
+                                    if ($this.treegrid('getParentNodeId') != null) {
+                                        rootid = $this.treegrid('getParentNodeId');
+                                        title = $this.text() + title;
+                                        findRootid($this.treegrid('getParentNode'));
+                                    } else {
+                                        //增加标题
+                                        title = $this.text() + ":" + title;
+                                        $(".col-sm-12 ").find("h4").remove();
+                                        $(".col-sm-12 p").before("<h4 align='center'>" + title + "</h4>");
+                                        title = ""
+                                    }
+                                }
+                                findRootid(source);
                                 // 删除原数据
                                 $(".col-sm-12").find("span").next().remove()
                                 $(".col-sm-12").find("span").remove();
@@ -636,7 +621,7 @@
             }
             $.ajax({
                 type: "post",
-                url: "TimeTableResultUpload",
+                url: "../../../TimeTableResultUpload",
                 async: false,
                 dataType: 'text',
                 // data: { strJson: JSON.stringify(row) },
