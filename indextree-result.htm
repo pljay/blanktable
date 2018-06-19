@@ -33,7 +33,8 @@
 <body>
 <div class="container">
     <div class="component">
-        <h3>课程表</h3>
+        <h3 style="text-align: center">课程表</h3>
+        <button class="btn  btn-success btn-lg" style="float: right">保存</button>
     </div>
     <div class='chat'>
         <header>
@@ -209,23 +210,23 @@
             <tbody>
             <tr value="01">
                 <th>1</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
             </tr>
             <tr value="02">
                 <th>2</th>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
+                <td><span class="ui-droppable">11<img src="btn_delete.png"></span><br></td>
             </tr>
             <tr value="03">
                 <th>3</th>
@@ -360,13 +361,18 @@
 
 <script>
     $(document).ready(function () {
+        function getUrlParam(name) {
+            var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+            var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+            if (r != null) return unescape(r[2]); return null; //返回参数值
+        }
+        var taskid=getUrlParam("taskid");
         var banlist = new Array();
-        var taskid = "";
         var schoolid = "";
         var classid = "";
         $.ajax({
             type: "post",
-            url: "../../../IsDoubleweek?taskid=" + localStorage.getItem("taskid"),
+            url: "../../../IsDoubleweek?taskid=" + taskid,
             async: false,
             dataType: "jsonp",
             jsonpCallback: "jsonpCallback",//自定义的jsonp回调函数名,默认为jQuery自动生成的随机函数
@@ -376,7 +382,6 @@
                 if (data === undefined || data.amount == "") {
                     $(".col-sm-12").parent().append("<h3 style='text-align: center'>没有找到匹配数据</h3>");
                     $(".col-sm-12").remove();
-
                 } else {
                     var type = data.type;
                     var amount = data.amount;
@@ -384,12 +389,41 @@
                     taskid = data.taskid;
                     schoolid = data.schoolid;
                     tablelimit(data);
-                    $(".col-sm-12").css("display", "none");
-                    $(".col-sm-12").parent().append("<h2 style='text-align: center'>请选择班级</h2>");
-                }
+                    $.ajax({
+                        type: "post",
+                        url: "../../../TimetableResultList",
+                        async: true,
+                        dataType: 'json',
+                        // data: { strJson: JSON.stringify(row) },
+                        //获取大课表
+                        data: {taskid: taskid, schoolid: schoolid},
+                        success: function (data) {
+                            // 删除原数据
+                            $(".col-sm-12").find("span").next().remove()
+                            $(".col-sm-12").find("span").remove();
 
-                ;
-
+                            $('.col-sm-12 table tr td').each(function () {
+                                var id = $(this).attr("id");
+                                for (var i = 0; i < data.length; i++) {
+                                    if (id == data[i].id && data[i].courseid != "") {
+                                        $(this).append("<span id='" + data[i].courseid + "'gradeid='" + data[i].gradeid + "' classid='" + data[i].classid + "' subjectid='" + data[i].subjectid + "'  teacherid='" + data[i].teacherid + "'   class='" + data[i].coursetype + "'>" + data[i].coursename + "<img src='btn_delete.png' ></span><br>");
+                                    }
+                                }
+                            });
+                            $(".col-sm-12 table").each(function(){
+                                $(this).tableExport({
+                                    formats: ["xlsx"],
+                                    position: "top",
+                                });
+                            });
+                        },
+                        error: function () {
+                            alert("Error");
+                        },
+                        complete: function () {
+                        }
+                    });
+                };
                 $('.col-sm-12 table tr td').each(
                     function () {
                         // let this = $(this);
@@ -401,20 +435,17 @@
                         var id = lie + hang;
                         $(this).attr("id", id);
                     });
-
             },
             error: function () {
-                /* $(".col-sm-12").parent().append("<h3 style='text-align: center'>没有找到匹配数据</h3>");
-                 $(".col-sm-12").remove();*/
+              /*  $(".col-sm-12").parent().append("<h3 style='text-align: center'>没有找到匹配数据</h3>");
+                 $(".col-sm-12").remove()*/
             },
             complete: function () {
-
             }
         });
-
         var $table = $("#tbb");
         $table.bootstrapTable({
-            url: 'http://localhost:8080/SchoolTimetable/GradeAndTeacherList?taskid=20180070005',
+            url: '../../../GradeAndTeacherList?taskid='+taskid,
             dataType: "jsonp",//数据类型
             method: 'get',
             async: false,
@@ -423,13 +454,11 @@
             striped: true,
             sidePagenation: 'server',
             idField: 'id',
-
             columns: [
                 {
                     field: 'name',
                     title: '名称',
                     align: 'center'
-
                 }
             ],
             treeShowField: 'name',
@@ -437,7 +466,6 @@
             /*            onClickCell: function (field, value, row, $element) {
                             alert("列名："+field+"     值："+value)
                         },*/
-
             onLoadSuccess: function (data) {
                 $table.treegrid({
                     initialState: 'collapsed',
@@ -446,29 +474,76 @@
                     expanderCollapsedClass: 'glyphicon glyphicon-triangle-right',
                     onChange: function () {
                         $table.bootstrapTable('resetWidth');
-                    },
 
+                    },
+                });
+                $('.chat').draggable({
+                    handle: 'header'
                 });
                 $('.chat ').find('tr').on('click', function () {
-                    if ($(this).treegrid('isLeaf')) {
-                        var id = $(this).treegrid('getNodeId');
-                        alert($(this).treegrid('getNodeId'));
+
+                    var source = $(this)
+                    var type = ""
+                    var id = $(this).treegrid("getNodeId")
+
+                    if (!$(this).treegrid('isRoot')) //判断是否是根节点
+                    {
+                        $(this).find("span").each(function () {
+                            type = $(this).attr("querytype");
+                            if (type === undefined) {
+                            } else {
+                                type = $(this).attr("querytype");
+                            }
+                        })
+                        console.log(type)
+                        var rootid = "";
+                        var title = "";
+                        //递归获取节点名称
+                        function findRootid(source) {
+                            //dom对象转换为jQuery对象
+                            //目的使用jQuery方法
+                            $this = $(source)
+                            if ($this.treegrid('getParentNodeId') != null) {
+                                rootid = $this.treegrid('getParentNodeId');
+                                title = $this.text() + title;
+                                findRootid($this.treegrid('getParentNode'));
+                            } else {
+                                //增加标题
+                                title = $this.text() + "<br>" + title;
+                                $(".col-sm-12 ").find("h4").remove();
+                                $(".col-sm-12 p").before("<h4 align='center'>" + title + "</h4>");
+                                title = ""
+                            }
+                        }
+
+                        findRootid(source);
                         $.ajax({
                             type: "post",
-                            url: "../../../CourseRulesInfoList",
+                            url: "../../../TimetableResultList",
                             async: true,
                             dataType: 'json',
                             // data: { strJson: JSON.stringify(row) },
-                            data: {taskid: taskid, id: id, schoolid: schoolid},
+                            //type:表示请求数据参数类型,老师:teacher 科目:subject
+                            //id:对应teacher和subjectid
+                            data: {taskid: taskid, id: id, schoolid: schoolid, type: type},
                             success: function (data) {
-                                $(".col-sm-12").parent().find("h2").remove();
+                                // 删除原数据
+                                $(".col-sm-12").find("span").next().remove()
+                                $(".col-sm-12").find("span").remove();
+
                                 $('.col-sm-12 table tr td').each(function () {
                                     var id = $(this).attr("id");
                                     for (var i = 0; i < data.length; i++) {
                                         if (id == data[i].id && data[i].courseid != "") {
-                                            $(this).append("<span id='" + data[i].courseid + "'class='" + data[i].coursetype + "'>" + data[i].coursename + "<img src='btn_delete.png' ></span><br>");
+                                            $(this).append("<span id='" + data[i].courseid + "'gradeid='" + data[i].gradeid + "' classid='" + data[i].classid + "' subjectid='" + data[i].subjectid + "'  teacherid='" + data[i].teacherid + "'   class='ui-droppable'>" + data[i].coursename + "<img src='btn_delete.png' ></span><br>");
                                         }
                                     }
+                                });
+                                $(".col-sm-12 table").each(function(){
+                                    $(this).tableExport({
+                                        formats: ["xlsx"],
+                                        position: "top",
+                                    });
                                 });
                             },
                             error: function () {
@@ -478,30 +553,103 @@
 
                             }
                         });
+                    } else {
+
                     }
                 })
             },
 
+        });
+        $(".component button").click(function () {
+            $('.col-sm-12 table tr td').each(function () {
+                if ($(this).children().length > 0) {
+                    $(this).find("span").each(function () {
+                        var course = new Object();
+                        course.id = $(this).parent().attr("id");
+                        course.gradeid = $(this).attr("gradeid");
+                        course.gradename = $(this).attr("gradename");
+                        course.classid = $(this).attr("classid");
+                        course.classname = $(this).attr("classname");
+                        course.subjectid = $(this).attr("subjectid");
+                        course.subjectname = $(this).attr("subjectname");
+                        course.teacherid = $(this).attr("teacherid");
+                        course.teachername = $(this).attr("teachername");
+                        banlist.push(course);
+                    });
+                } else {
+                    var course = new Object();
+                    course.id = $(this).attr("id");
+                    course.gradeid = "";
+                    course.gradename = "";
+                    course.classid = "";
+                    course.classname = "";
+                    course.subjectid = "";
+                    course.subjectname = "";
+                    course.teacherid = "";
+                    course.teachername = "";
+                    banlist.push(course);
+                }
+
+            });
+            var json = {
+                taskid: taskid,
+                schoolid: schoolid,
+                classid: classid,
+                banlist: banlist
+            }
+            $.ajax({
+                type: "post",
+                url: "../../../TimeTableResultUpload",
+                async: false,
+                dataType: 'text',
+                // data: { strJson: JSON.stringify(row) },
+                data: {
+                    strJson: JSON.stringify(json)
+                },
+                success: function (data) {
+                    if (data == "success") {
+                        alert("成功")
+                    }
+
+                },
+                error: function () {
+                    alert("Error");
+                },
+                complete: function () {
+
+                }
+            });
+            banlist.length = 0;
         });
 
     });
 </script>
 <script src="jquery-ui.js"></script>
 <script type="text/javascript" language="javascript">
-    $('.chat').draggable({
-        handle: 'header'
-    });
 
 </script>
 
 <script type="text/javascript">
-    $(function () {
-        $(".col-sm-12 table").tableExport({
-            formats: ["xlsx"],
-            position: "top right"
-
+    $('.col-sm-12 table tbody tr td').on('click', 'img', function (event) {
+        event.stopPropagation();
+        $(this).parent().next().remove();
+        $(this).parent().remove();
+    });
+    //拖拽复制体
+    $('.col-sm-12 tr td span').draggable({
+        helper: "clone",
+        cursor: "move"
+    });
+    //释放后
+    $('.col-sm-12 table tbody tr td ').droppable(
+        {
+            drop: function (event, ui) {
+                var source = ui.draggable.clone(true);
+                source.attr("class", $(this).attr("class"));
+                $(this).append(source);
+                $(this).append("<br>");
+            }
         });
-    })
 </script>
 </body>
 </html>

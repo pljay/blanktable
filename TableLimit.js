@@ -1,5 +1,4 @@
 function tablelimit(data) {
-
         var type = data.type;
         var amount = data.amount;
         var weeks = data.weeks;

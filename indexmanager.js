@@ -11,7 +11,6 @@ function getUrlParam(name) {
 var taskid=getUrlParam("taskid");
 localStorage.setItem("taskid",taskid);
 var maxHeight = 400;
-
 $(function(){
 
     $(".dropdown > li").hover(function() {

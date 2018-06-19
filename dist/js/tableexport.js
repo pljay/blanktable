@@ -139,7 +139,9 @@
         $("button[data-fileblob]").on("click", function () {
             var object = $(this).data("fileblob"),
                 data = object.data,
-                fileName = object.fileName,
+              /*  fileName = object.fileName,源码*/
+                //修改后
+                fileName=$(this).parent().parent().parent().find("h4").text()+$(this).parent().parent().parent().find("p").text();
                 mimeType = object.mimeType,
                 fileExtension = object.fileExtension;
             export2file(data, mimeType, fileName, fileExtension);

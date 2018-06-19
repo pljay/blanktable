@@ -94,8 +94,10 @@
         return [$(el).off('click'), $(el).on("click", function (e) {
             if ($(this).data("obj")) {
                 e.preventDefault();
+
                 var object = $(this).data("obj"),
                     data2 = object.data,
+
                     fileName = object.name;
                 export2xlsx(data2, fileName);
             }

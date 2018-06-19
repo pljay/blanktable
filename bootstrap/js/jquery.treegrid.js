@@ -298,6 +298,7 @@
                 return $(this).treegrid('getSetting', 'getNodeById').apply(this, [$(this).treegrid('getParentNodeId'), $(this).treegrid('getTreeContainer')]);
             }
         },
+
         /**
          * Method return array of child nodes or null if node is leaf
          * 
